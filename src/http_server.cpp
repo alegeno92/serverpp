@@ -32,21 +32,26 @@ int main(){
         std::stringstream file_content;
         file_content << requested_page.rdbuf(); 
         std::string content = file_content.str();
-        if(filename.find(".html")==1){ 
-            return std::make_shared<HttpResponse>(200, "OK",
-
-                                              HttpErrorCode::Ok,
-                                              WebSocketHttpHeaders(),
-                                              content);
-        }else{
-            return std::make_shared<HttpResponse>(200, "OK",
-
-                                              HttpErrorCode::Ok,
-                                              std::map("content-type:","application/javascript", CaseInsensitiveLess),
-                                              content);
+        std::cout << filename << std::endl;
+        
+        WebSocketHttpHeaders headers;
+        
+        if(filename.find(".js")!=-1){
+        headers["Content-Type"] = "application/javascript";
+        }else if(filename.find(".css")!=-1){
+        headers["Content-Type"] = "stylesheet";
+        }else if(filename.find(".html")!=-1){
+        headers["Content-Type"] = "text/html";
         }
         
-        }
+            
+            
+        return std::make_shared<HttpResponse>(200, "OK",
+
+                                              HttpErrorCode::Ok,
+                                              headers,
+                                              content);
+    }
     );
     server.start();
     server.wait();
