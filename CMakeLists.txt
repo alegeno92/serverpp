@@ -10,10 +10,10 @@ find_package (ZLIB REQUIRED)
 
 add_subdirectory(lib/IXWebSocket)
 
-add_executable(server src/main.cpp)
+add_executable(ws_server src/ws_server.cpp)
 
-target_link_libraries (server ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(server ${PROJECT_BINARY_DIR}/lib/IXWebSocket/libixwebsocket.a)
-target_link_libraries(server ${ZLIB_LIBRARIES})
+target_link_libraries (ws_server ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(ws_server ${PROJECT_BINARY_DIR}/lib/IXWebSocket/libixwebsocket.a)
+target_link_libraries(ws_server ${ZLIB_LIBRARIES})
 
-include_directories(lib/IXWebSocket/ixwebsocket)
+include_directories(lib/IXWebSocket/)

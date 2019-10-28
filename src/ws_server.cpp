@@ -1,5 +1,5 @@
 #include <iostream>
-#include <IXWebSocketServer.h>
+#include <ixwebsocket/IXWebSocketServer.h>
 
 using namespace ix;
 int main() {
