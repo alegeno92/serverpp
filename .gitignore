@@ -1,1 +1,4 @@
 build/
+templates/
+.idea/
+cmake-build-debug/
