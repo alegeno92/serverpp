@@ -15,7 +15,7 @@ include(GNUInstallDirs)
 
 include_directories(lib/IXWebSocket/)
 include_directories(include/)
-add_executable(server src/main.cpp src/HttpServer.cpp src/WebSocketServer.cpp src/blocking_queue.cpp src/mqtt_client.cpp)
+add_executable(server src/main.cpp src/http_server.cpp src/websocket_server.cpp src/blocking_queue.cpp src/mqtt_client.cpp)
 
 target_link_libraries (server ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(server ${PROJECT_BINARY_DIR}/lib/IXWebSocket/libixwebsocket.a)

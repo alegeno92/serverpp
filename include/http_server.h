@@ -2,8 +2,8 @@
 // Created by alessandro on 28/10/19.
 //
 
-#ifndef SERVER_HTTPSERVER_H
-#define SERVER_HTTPSERVER_H
+#ifndef SERVER_HTTP_SERVER_H
+#define SERVER_HTTP_SERVER_H
 
 
 #include <ixwebsocket/IXHttp.h>
@@ -12,18 +12,15 @@
 
 class HttpServer {
 public:
-    HttpServer();
-
-    HttpServer(int port, const std::string& host);
+    HttpServer(int port, const std::string &host);
 
     bool start();
 
     virtual ~HttpServer();
 
 private:
-    ix::HttpServer* _server;
-
+    ix::HttpServer *_server;
 };
 
 
-#endif //SERVER_HTTPSERVER_H
+#endif //SERVER_HTTP_SERVER_H
