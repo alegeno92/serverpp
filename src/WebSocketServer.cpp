@@ -37,11 +37,8 @@ WebSocketServer::WebSocketServer(int port, const std::string &host) {
                             }
                             else if (msg->type == ix::WebSocketMessageType::Message)
                             {
-                                // For an echo server, we just send back to the client whatever was received by the server
-                                // All connected clients are available in an std::set. See the broadcast cpp example.
-                                // Second parameter tells whether we are sending the message in binary or text mode.
-                                // Here we send it in the same mode as it was received.
                                 webSocket->send(msg->str, msg->binary);
+                                std::cout << msg->str << std::endl;
                             }
                         }
                 );

@@ -7,14 +7,20 @@ set(CMAKE_CURRENT_SOURCE_DIR "lib/IXWebSocket")
 set(CMAKE_CXX_FLAGS "-pthread -lz")
 find_package (Threads)
 find_package (ZLIB REQUIRED)
+find_package(PahoMqttCpp REQUIRED)
+
+
 
 add_subdirectory(lib/IXWebSocket)
+include(ExternalProject)
+include(GNUInstallDirs)
 
+include_directories(lib/IXWebSocket/)
+include_directories(include/)
+add_executable(server src/main.cpp src/HttpServer.cpp src/WebSocketServer.cpp src/blocking_queue.cpp src/mqtt_client.cpp)
 
-add_executable(server src/main.cpp src/HttpServer.cpp include/HttpServer.h src/WebSocketServer.cpp include/WebSocketServer.h)
 
 target_link_libraries (server ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(server ${PROJECT_BINARY_DIR}/lib/IXWebSocket/libixwebsocket.a)
 target_link_libraries(server ${ZLIB_LIBRARIES})
-
-include_directories(lib/IXWebSocket/)
+target_link_libraries(server paho-mqttpp3)

@@ -1,63 +1,29 @@
 #include <iostream>
-#include <ixwebsocket/IXWebSocketServer.h>
+#include <HttpServer.h>
+#include <WebSocketServer.h>
+#include <thread>
 
-using namespace ix;
-int main() {
+
+
+int start_http(int port, const std::string &hostname);
+int start_ws(int port, const std::string &hostname);
+
+
+int main(int argn, char* argv[]) {
     int port = 8080;
-    WebSocketServer server(port);
+    std::string ip = "0.0.0.0";
+    std::thread http(start_http, 80, ip);
+    std::thread ws(start_ws, 8080, ip); 
+    http.join();
+    ws.join();
+}
 
-    server.setOnConnectionCallback(
-            [&server](std::shared_ptr<WebSocket> webSocket,
-                      std::shared_ptr<ConnectionState> connectionState)
-            {
-                webSocket->setOnMessageCallback(
-                        [webSocket, connectionState, &server](const ix::WebSocketMessagePtr msg)
-                        {
-                            std::cout << msg->str;
 
-                            if (msg->type == ix::WebSocketMessageType::Open)
-                            {
-                                std::cerr << "New connection" << std::endl;
-
-                                // A connection state object is available, and has a default id
-                                // You can subclass ConnectionState and pass an alternate factory
-                                // to override it. It is useful if you want to store custom
-                                // attributes per connection (authenticated bool flag, attributes, etc...)
-                                std::cerr << "id: " << connectionState->getId() << std::endl;
-
-                                // The uri the client did connect to.
-                                std::cerr << "Uri: " << msg->openInfo.uri << std::endl;
-
-                                std::cerr << "Headers:" << std::endl;
-                                for (const auto& it : msg->openInfo.headers)
-                                {
-                                    std::cerr << it.first << ": " << it.second << std::endl;
-                                }
-                            }
-                            else if (msg->type == ix::WebSocketMessageType::Message)
-                            {
-                                // For an echo server, we just send back to the client whatever was received by the server
-                                // All connected clients are available in an std::set. See the broadcast cpp example.
-                                // Second parameter tells whether we are sending the message in binary or text mode.
-                                // Here we send it in the same mode as it was received.
-                                webSocket->send(msg->str, msg->binary);
-                            }
-                        }
-                );
-            }
-    );
-
-    auto res = server.listen();
-    if (!res.first)
-    {
-        // Error handling
-        return 1;
-    }
-
-// Run the server in the background. Server can be stoped by calling server.stop()
-    server.start();
-
-// Block until server.stop() is called.
-    server.wait();
-
+int start_http(int port, const std::string &hostname){
+    HttpServer http_server(port, hostname);
+    http_server.start();
+}
+int start_ws(int port, const std::string &hostname){
+    WebSocketServer ws_server(port, hostname);
+    ws_server.start();
 }
