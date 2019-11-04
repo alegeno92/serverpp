@@ -14,6 +14,12 @@ public:
 
     bool start();
 
+    void handleMessage(const ix::WebSocketMessagePtr &message);
+
+    static std::string mockData();
+
+    bool sendMessage(const std::string &message) const;
+
     virtual ~WebsocketServer();
 
 private:

@@ -3,7 +3,7 @@
 #include <websocket_server.h>
 #include <thread>
 
-#define WS_PORT 8080
+#define WS_PORT 8086
 #define HTTP_PORT 8000
 
 int start_http(int port, const std::string &hostname);
