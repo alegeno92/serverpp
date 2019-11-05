@@ -10,16 +10,19 @@
 #include <ixwebsocket/IXConnectionState.h>
 #include <ixwebsocket/IXHttpServer.h>
 
-class HttpServer {
+class http_server {
+    int port;
+    std::string host;
+    ix::HttpServer *_server;
+
 public:
-    HttpServer(int port, const std::string &host);
+    http_server(int port, const std::string &host);
 
     bool start();
 
-    virtual ~HttpServer();
+    virtual ~http_server();
 
-private:
-    ix::HttpServer *_server;
+
 };
 
 

@@ -7,7 +7,8 @@
 #include <iostream>
 #include <jsoncpp/json/reader.h>
 
-WebsocketServer::WebsocketServer(int port, const std::string &host) {
+websocket_server::websocket_server(int port, const std::string &host) :
+        host(host), port(port) {
     _server = new ix::WebSocketServer(port, host);
     _server->setOnConnectionCallback(
             [this](const std::shared_ptr<ix::WebSocket> &webSocket,
@@ -25,7 +26,7 @@ WebsocketServer::WebsocketServer(int port, const std::string &host) {
                             } else if (msg->type == ix::WebSocketMessageType::Message) {
                                 //this->handleMessage(msg);
                                 std::cout << "SEND MESSAGE" << std::endl;
-                                webSocket->send(mockData());
+                                webSocket->send(mock_data());
                             }
                         }
                 );
@@ -33,7 +34,8 @@ WebsocketServer::WebsocketServer(int port, const std::string &host) {
     );
 }
 
-bool WebsocketServer::start() {
+bool websocket_server::start() {
+    std::cout << "[WSOK] Opening websocket on " << host<< ':' << port << std::endl;
     auto res = _server->listen();
     if (!res.first) {
         // Error handling
@@ -44,18 +46,18 @@ bool WebsocketServer::start() {
     return true;
 }
 
-WebsocketServer::~WebsocketServer() {
+websocket_server::~websocket_server() {
     _server->stop();
 }
 
-void WebsocketServer::handleMessage(const ix::WebSocketMessagePtr &message) {
+void websocket_server::handle_message(const ix::WebSocketMessagePtr &message) {
     Json::Value val;
     Json::Reader reader;
     bool success = reader.parse(message->str, val);
-    sendMessage(mockData());
+    send_message(mock_data());
 }
 
-bool WebsocketServer::sendMessage(const std::string &message) const {
+bool websocket_server::send_message(const std::string &message) const {
     auto clients = _server->getClients();
     for (const auto &client : clients) {
         client.get()->sendText(message);
@@ -63,7 +65,7 @@ bool WebsocketServer::sendMessage(const std::string &message) const {
     return false;
 }
 
-std::string WebsocketServer::mockData() {
+std::string websocket_server::mock_data() {
     Json::Value data;
     data["memory"]["free"] = 59;
     data["memory"]["total"] = 100;

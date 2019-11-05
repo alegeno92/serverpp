@@ -8,22 +8,24 @@
 
 #include <ixwebsocket/IXWebSocketServer.h>
 
-class WebsocketServer {
+class websocket_server {
+    int port;
+    std::string host;
+    ix::WebSocketServer *_server;
+
 public:
-    WebsocketServer(int port, const std::string &host);
+    websocket_server(int port, const std::string &host);
 
     bool start();
 
-    void handleMessage(const ix::WebSocketMessagePtr &message);
+    void handle_message(const ix::WebSocketMessagePtr &message);
 
-    static std::string mockData();
+    static std::string mock_data();
 
-    bool sendMessage(const std::string &message) const;
+    bool send_message(const std::string &message) const;
 
-    virtual ~WebsocketServer();
+    virtual ~websocket_server();
 
-private:
-    ix::WebSocketServer *_server;
 };
 
 

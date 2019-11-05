@@ -7,12 +7,12 @@
 #include <sstream>
 #include "http_server.h"
 
-HttpServer::HttpServer(const int port, const std::string &host) {
+http_server::http_server(const int port, const std::string &host) :
+        host(host), port(port) {
     _server = new ix::HttpServer(port, host);
     _server->setOnConnectionCallback([](const ix::HttpRequestPtr &request,
                                         const std::shared_ptr<ix::ConnectionState> & /*connectionState*/) -> ix::HttpResponsePtr {
-        // Build a string for the response
-        std::cout << "HTTP: [" << request->method << "]" << request->uri;
+        std::cout << "[HTTP] [" << request->method << "]" << request->uri;
         std::string ss = request->uri;
         std::string filename = "../public/" + ss.erase(0, 1);
         std::ifstream requestedPage(filename);
@@ -42,11 +42,12 @@ HttpServer::HttpServer(const int port, const std::string &host) {
     });
 }
 
-HttpServer::~HttpServer() {
+http_server::~http_server() {
     _server->stop();
 }
 
-bool HttpServer::start() {
+bool http_server::start() {
+    std::cout << "[HTTP] Opening websocket on " << host<< ':' << port << std::endl;
     auto res = _server->listen();
     if (!res.first) {
         std::cerr << res.second << std::endl;

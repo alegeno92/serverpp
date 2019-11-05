@@ -4,7 +4,7 @@
 
 
 template<typename T>
-class BlockingQueue {
+class blocking_queue {
 private:
     std::mutex d_mutex;
     std::condition_variable d_condition;
