@@ -1,3 +1,4 @@
+#pragma once
 #include <mutex>
 #include <condition_variable>
 #include <deque>
@@ -14,3 +15,43 @@ public:
 
     T pop();
 };
+
+
+typedef struct message {
+    struct memory{
+        int free;
+        int total;
+    }memory;
+
+    struct loads{
+        int free;
+        int total;
+    }loads;
+
+    struct storage{
+        int free;
+        int total;
+    }storage;
+
+    int people;
+} t_message;
+
+
+
+template<typename T>
+void blocking_queue<T>::push(T const &value) {
+    {
+        std::unique_lock<std::mutex> lock(this->d_mutex);
+        d_queue.push_front(value);
+    }
+    this->d_condition.notify_one();
+}
+
+template<typename T>
+T blocking_queue<T>::pop() {
+    std::unique_lock<std::mutex> lock(this->d_mutex);
+    this->d_condition.wait(lock, [=] { return !this->d_queue.empty(); });
+    T rc(std::move(this->d_queue.back()));
+    this->d_queue.pop_back();
+    return rc;
+}
