@@ -1,7 +1,13 @@
+//
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
+//
+
 #include <iostream>
+#include <thread>
+
 #include <http_server.h>
 #include <websocket_server.h>
-#include <thread>
 #include <mqtt_client.h>
 #include <blocking_queue.h>
 

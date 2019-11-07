@@ -1,11 +1,13 @@
 //
-// Created by alessandro on 28/10/19.
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
 //
 
 #ifndef SERVER_WEBSOCKET_SERVER_H
 #define SERVER_WEBSOCKET_SERVER_H
 
 #include <ixwebsocket/IXWebSocketServer.h>
+
 #include "blocking_queue.h"
 
 class websocket_server {

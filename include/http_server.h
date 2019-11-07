@@ -1,10 +1,10 @@
 //
-// Created by alessandro on 28/10/19.
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
 //
 
 #ifndef SERVER_HTTP_SERVER_H
 #define SERVER_HTTP_SERVER_H
-
 
 #include <ixwebsocket/IXHttp.h>
 #include <ixwebsocket/IXConnectionState.h>

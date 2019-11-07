@@ -1,3 +1,8 @@
+//
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
+//
+
 #pragma once
 #include <mutex>
 #include <condition_variable>

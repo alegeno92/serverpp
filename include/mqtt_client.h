@@ -1,5 +1,6 @@
 //
-// Created by alessandro on 05/11/19.
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
 //
 
 #ifndef SERVER_MQTT_CLIENT_H
@@ -9,6 +10,7 @@
 #include <vector>
 #include <mqtt/connect_options.h>
 #include <mqtt/async_client.h>
+
 #include "blocking_queue.h"
 
 class mqtt_client : public virtual mqtt::callback,

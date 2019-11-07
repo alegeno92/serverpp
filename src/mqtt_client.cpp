@@ -1,11 +1,13 @@
 //
-// Created by alessandro on 05/11/19.
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
 //
 
-#include "mqtt_client.h"
 #include <utility>
 #include <vector>
 #include <json/json.h>
+
+#include "mqtt_client.h"
 
 mqtt_client::mqtt_client(const std::string &clientId,
                          const std::string &server,

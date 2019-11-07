@@ -1,11 +1,12 @@
 //
-// Created by alessandro on 28/10/19.
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
 //
-
-#include "websocket_server.h"
 
 #include <iostream>
 #include <json/json.h>
+
+#include "websocket_server.h"
 
 websocket_server::websocket_server(int port, const std::string &host, blocking_queue<t_message> *messages) :
         host(host), port(port), messages_queue(messages) {

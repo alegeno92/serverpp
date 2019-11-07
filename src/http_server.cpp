@@ -1,11 +1,13 @@
 //
-// Created by alessandro on 28/10/19.
+// Created by Alessandro Genovese on 28/10/19.
+// ale.geno92@gmail.com
 //
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <utility>
+
 #include "http_server.h"
 
 http_server::http_server(const int port, std::string host, std::string public_path) :
