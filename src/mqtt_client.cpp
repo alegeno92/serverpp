@@ -2,21 +2,24 @@
 // Created by alessandro on 05/11/19.
 //
 
+#include "mqtt_client.h"
 #include <utility>
 #include <vector>
-#include "mqtt_client.h"
+#include <json/json.h>
 
 mqtt_client::mqtt_client(const std::string &clientId,
                          const std::string &server,
                          int keepAliveInterval,
                          bool cleanSession,
-                         std::vector<std::string> subscriptionPaths) :
+                         std::vector<std::string> subscriptionPaths,
+                         blocking_queue<t_message> *messages) :
         client_id(clientId),
         server(server),
         keep_alive_interval(keepAliveInterval),
         clean_session(cleanSession),
         n_retry(5),
-        subscription_topics(std::move(subscriptionPaths)) {
+        subscription_topics(std::move(subscriptionPaths)),
+        messages_queue(messages) {
 
     connect_options.set_keep_alive_interval(keepAliveInterval);
     connect_options.set_clean_session(cleanSession);
@@ -91,6 +94,33 @@ void mqtt_client::connection_lost(const std::string &cause) {
 
 void mqtt_client::message_arrived(mqtt::const_message_ptr msg) {
     std::cout << "[MQTT] Message arrived: [" << msg->get_topic() << "] " << msg->to_string() << std::endl;
+    hydrate(msg->get_topic(), msg->get_payload());
 }
 
 void mqtt_client::delivery_complete(mqtt::delivery_token_ptr token) {}
+
+void mqtt_client::hydrate(const std::string &topic, const std::string &payload) {
+
+    Json::Value root;
+    Json::Reader reader;
+    t_message message = t_message();
+    reader.parse(payload, root);
+    if (topic.find("loads") != std::string::npos) {
+        message.message_type = t_message_type::loads;
+        message.loads.total = root["loads"]["total"].asInt();
+        message.loads.free = root["loads"]["free"].asInt();
+    } else if (topic.find("storage") != std::string::npos) {
+        message.message_type = t_message_type::storage;
+        message.storage.total = root["storage"]["total"].asInt();
+        message.storage.free = root["storage"]["free"].asInt();
+    } else if (topic.find("memory") != std::string::npos) {
+        message.message_type = t_message_type::memory;
+        message.memory.total = root["memory"]["total"].asInt();
+        message.memory.free = root["memory"]["free"].asInt();
+    } else {
+        message.message_type = t_message_type::people;
+        message.people = root["people"]["number"].asInt();
+    }
+
+    messages_queue->push(message);
+}

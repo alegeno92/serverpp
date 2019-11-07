@@ -9,6 +9,7 @@
 #include <vector>
 #include <mqtt/connect_options.h>
 #include <mqtt/async_client.h>
+#include "blocking_queue.h"
 
 class mqtt_client : public virtual mqtt::callback,
                     public virtual mqtt::iaction_listener {
@@ -23,10 +24,11 @@ class mqtt_client : public virtual mqtt::callback,
     std::vector<std::string> subscription_topics;
     mqtt::connect_options connect_options;
     mqtt::async_client *client;
+    blocking_queue<t_message> *messages_queue;
 
 public:
     mqtt_client(const std::string &clientId, const std::string &server, int keepAliveInterval, bool cleanSession,
-                std::vector<std::string> subscriptionPaths);
+                std::vector<std::string> subscriptionPaths, blocking_queue<t_message> *messages);
 
     bool connect();
 
@@ -47,6 +49,8 @@ public:
     bool subscribeAll();
 
     bool subscribe(const std::string &topic);
+
+    void hydrate(const std::string &topic, const std::string &);
 };
 
 

@@ -16,8 +16,16 @@ public:
     T pop();
 };
 
+typedef enum class message_type{
+    memory,
+    loads,
+    storage,
+    people
+}t_message_type;
 
 typedef struct message {
+    t_message_type message_type;
+
     struct memory{
         int free;
         int total;
