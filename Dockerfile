@@ -1,4 +1,7 @@
-FROM cmake-3.15.5 AS paho-c
+FROM --platform=$BUILDPLATFORM alegeno92/cmake:3.15.5 AS paho-c
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /log
 RUN apk add --no-cache git libressl-dev
 RUN apk add --no-cache --upgrade bash
 RUN git clone https://github.com/eclipse/paho.mqtt.c.git
@@ -26,7 +29,9 @@ RUN cmake --build . --target ixwebsocket --
 RUN cmake --build . --target server --
 
 
-FROM alpine:latest
+FROM --platform=$BUILDPLATFORM  alpine:latest
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 RUN apk add --no-cache zlib libressl libstdc++
 COPY ./public/* ./public/
 COPY --from=build-container /home/server/build/server ./
