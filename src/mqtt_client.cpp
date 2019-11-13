@@ -109,16 +109,16 @@ void mqtt_client::hydrate(const std::string &topic, const std::string &payload) 
     reader.parse(payload, root);
     if (topic.find("loads") != std::string::npos) {
         message.message_type = t_message_type::loads;
-        message.loads.total = root["loads"]["total"].asInt();
-        message.loads.free = root["loads"]["free"].asInt();
+        message.loads.total = root["data"]["max"].asInt();
+        message.loads.free = root["data"]["value"].asInt();
     } else if (topic.find("storage") != std::string::npos) {
         message.message_type = t_message_type::storage;
-        message.storage.total = root["storage"]["total"].asInt();
-        message.storage.free = root["storage"]["free"].asInt();
+        message.storage.total = root["data"]["max"].asInt();
+        message.storage.free = root["data"]["value"].asInt();
     } else if (topic.find("memory") != std::string::npos) {
         message.message_type = t_message_type::memory;
-        message.memory.total = root["memory"]["total"].asInt();
-        message.memory.free = root["memory"]["free"].asInt();
+        message.memory.total = root["data"]["max"].asInt();
+        message.memory.free = root["data"]["value"].asInt();
     } else {
         message.message_type = t_message_type::people;
         message.people = root["people"]["number"].asInt();
