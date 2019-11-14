@@ -1,0 +1,23 @@
+{
+  "mqtt_client": {
+    "client_id": "server",
+    "host": "tcp://localhost:1883",
+    "subscription_paths": [
+      "loads",
+      "memory",
+      "people",
+      "storage"
+    ],
+    "keep_alive": 20,
+    "clean_session": true
+  },
+  "http_server": {
+    "public_directory": "./public",
+    "address": "0.0.0.0",
+    "port": 8000
+  },
+  "websocket_server": {
+    "address": "0.0.0.0",
+    "port": 8086
+  }
+}

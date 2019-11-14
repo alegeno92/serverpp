@@ -10,38 +10,63 @@
 #include <websocket_server.h>
 #include <mqtt_client.h>
 #include <blocking_queue.h>
+#include <fstream>
+#include <exceptions/InvalidPath.h>
+#include <json/json.h>
 
-#define WS_PORT 8086
-#define WS_ADDRESS "0.0.0.0"
+#define CONFIG_JSON "./config.json"
 
-#define HTTP_PORT 8000
-#define HTTP_ADDRESS "0.0.0.0"
-#define PUBLIC_DIRECTORY "./public/"
+using namespace std;
 
-#define MQTT_SERVER "tcp://localhost:1883"
-#define MQTT_CLIENT_ID "server"
 
+typedef struct configurations_t {
+    struct mqtt_client {
+        std::string client_id;
+        std::string host;
+        std::vector<std::string> subscription_paths;
+        int keep_alive = 20;
+        bool clean_session = true;
+    } mqtt_client;
+
+    struct http_server {
+        std::string public_directory;
+        std::string address;
+        int port = 8000;
+    } http_server;
+
+    struct ws_server {
+        std::string address;
+        int port = 8086;
+    } ws_server;
+} configurations_t;
+
+configurations_t parse_configuration(const std::string &config_path);
 
 int start_http(int port, const std::string &hostname, const std::string &public_directory);
 
-int start_web_socket(blocking_queue<t_message> *messages);
+int start_web_socket(int port, const std::string &hostname, blocking_queue<t_message> *messages);
 
 int main() {
     blocking_queue<t_message> messages;
 
-    std::vector<std::string> subscription_paths = {
-            "loads",
-            "memory",
-            "people",
-            "storage"
-    };
+    configurations_t config = parse_configuration(CONFIG_JSON);
 
-    mqtt_client client(MQTT_CLIENT_ID, MQTT_SERVER, 20, true, subscription_paths, &messages);
+    mqtt_client client(config.mqtt_client.client_id,
+                       config.mqtt_client.host,
+                       config.mqtt_client.keep_alive,
+                       config.mqtt_client.clean_session,
+                       config.mqtt_client.subscription_paths, &messages);
     client.connect();
 
-    std::thread http(start_http, HTTP_PORT, HTTP_ADDRESS, PUBLIC_DIRECTORY);
+    thread http(start_http,
+                     config.http_server.port,
+                     config.http_server.address,
+                     config.http_server.public_directory);
 
-    std::thread ws(start_web_socket, &messages);
+    thread ws(start_web_socket,
+            config.ws_server.port,
+            config.ws_server.address,
+            &messages);
     http.join();
     ws.join();
 }
@@ -53,8 +78,40 @@ int start_http(int port, const std::string &hostname, const std::string &public_
     return 0;
 }
 
-int start_web_socket(blocking_queue<t_message> *messages) {
-    websocket_server ws_server(WS_PORT, WS_ADDRESS, messages);
+int start_web_socket(int port, const std::string &hostname, blocking_queue<t_message> *messages) {
+    websocket_server ws_server(port, hostname, messages);
     ws_server.start();
     return 0;
+}
+
+configurations_t parse_configuration(const std::string &config_path) {
+    configurations_t configurations;
+    ifstream config_file(config_path);
+    if (!config_file.is_open()) {
+        throw InvalidPath();
+    }
+    stringstream config_file_content;
+    config_file_content << config_file.rdbuf();
+    Json::Value config;
+    Json::Reader reader;
+
+    reader.parse(config_file_content, config);
+
+    configurations.mqtt_client.client_id = config["mqtt_client"]["client_id"].asString();
+    configurations.mqtt_client.host = config["mqtt_client"]["host"].asString();
+    configurations.mqtt_client.keep_alive = config["mqtt_client"]["keep_alive"].asInt();
+    configurations.mqtt_client.clean_session = config["mqtt_client"]["clean_session"].asBool();
+    for (auto &s: config["mqtt_client"]["subscription_paths"]) {
+        configurations.mqtt_client.subscription_paths.push_back(s.asString());
+    }
+
+    configurations.http_server.port = config["http_server"]["port"].asInt();
+    configurations.http_server.address = config["http_server"]["address"].asString();
+    configurations.http_server.public_directory = config["http_server"]["public_directory"].asString();
+
+
+    configurations.ws_server.port = config["websocket_server"]["port"].asInt();
+    configurations.ws_server.address = config["websocket_server"]["address"].asString();
+
+    return configurations;
 }

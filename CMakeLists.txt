@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.14)
 project(server)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -20,7 +20,9 @@ include(GNUInstallDirs)
 
 file(GLOB server_SRC
     "include/*.h"
-    "src/*.cpp")
+    "include/exceptions/*.h"
+    "src/*.cpp"
+    "src/exceptions/*.cpp")
 
 file(GLOB jsoncpp_SRC
     "lib/jsoncpp/dist/json/*.h"
