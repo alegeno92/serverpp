@@ -121,7 +121,7 @@ void mqtt_client::hydrate(const std::string &topic, const std::string &payload) 
         message.memory.free = root["data"]["value"].asInt();
     } else {
         message.message_type = t_message_type::people;
-        message.people = root["people"]["number"].asInt();
+        message.people = root["data"]["value"].asInt();
     }
 
     messages_queue->push(message);

@@ -11,9 +11,9 @@
 #include <ixwebsocket/IXHttpServer.h>
 
 class http_server {
-    int port;
-    std::string host;
-    std::string public_path;
+    int _port;
+    std::string _host;
+    std::string _public_directory;
     ix::HttpServer *_server;
 private:
     ix::HttpResponsePtr handle_on_connection(const ix::HttpRequestPtr &request,
@@ -21,7 +21,7 @@ private:
 
 
 public:
-    http_server(int port, std::string host, std::string public_path);
+    http_server(int port, const std::string& host, const std::string&  public_directory);
 
     bool start();
 

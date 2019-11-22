@@ -14,7 +14,6 @@
 #include <exceptions/InvalidPath.h>
 #include <json/json.h>
 
-#define CONFIG_JSON "./config.json"
 
 using namespace std;
 
@@ -46,10 +45,14 @@ int start_http(int port, const std::string &hostname, const std::string &public_
 
 int start_web_socket(int port, const std::string &hostname, blocking_queue<t_message> *messages);
 
-int main() {
+int main(int argc, char** argv) {
     blocking_queue<t_message> messages;
 
-    configurations_t config = parse_configuration(CONFIG_JSON);
+    string config_path = argv[1];
+    cout << "[MAIN] Starting server..."<< endl;
+    cout << "[MAIN] Config path: "<< config_path << endl;
+
+    configurations_t config = parse_configuration(config_path);
 
     mqtt_client client(config.mqtt_client.client_id,
                        config.mqtt_client.host,
@@ -59,14 +62,14 @@ int main() {
     client.connect();
 
     thread http(start_http,
-                     config.http_server.port,
-                     config.http_server.address,
-                     config.http_server.public_directory);
+                config.http_server.port,
+                config.http_server.address,
+                config.http_server.public_directory);
 
     thread ws(start_web_socket,
-            config.ws_server.port,
-            config.ws_server.address,
-            &messages);
+              config.ws_server.port,
+              config.ws_server.address,
+              &messages);
     http.join();
     ws.join();
 }
@@ -105,13 +108,19 @@ configurations_t parse_configuration(const std::string &config_path) {
         configurations.mqtt_client.subscription_paths.push_back(s.asString());
     }
 
+    cout << "[MAIN] MQTT host: " << configurations.mqtt_client.host << endl;
+
     configurations.http_server.port = config["http_server"]["port"].asInt();
     configurations.http_server.address = config["http_server"]["address"].asString();
     configurations.http_server.public_directory = config["http_server"]["public_directory"].asString();
 
+    cout << "[MAIN] http_server: " << configurations.http_server.address << ":" << configurations.http_server.port
+         << endl;
+
 
     configurations.ws_server.port = config["websocket_server"]["port"].asInt();
     configurations.ws_server.address = config["websocket_server"]["address"].asString();
+    cout << "[MAIN] ws_server: " << configurations.ws_server.address << ":" << configurations.ws_server.port << endl;
 
     return configurations;
 }

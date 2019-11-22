@@ -6,14 +6,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <utility>
-
 #include "http_server.h"
 
-http_server::http_server(const int port, std::string host, std::string public_path) :
-        host(std::move(host)),
-        port(port),
-        public_path(std::move(public_path)) {
+using namespace std;
+
+http_server::http_server(int port, const std::string &host, const std::string &public_directory) :
+        _host(host),
+        _port(port),
+        _public_directory(public_directory) {
     _server = new ix::HttpServer(port, host);
     _server->setOnConnectionCallback(
             std::bind(&http_server::handle_on_connection, this, std::placeholders::_1, std::placeholders::_2));
@@ -24,7 +24,7 @@ http_server::~http_server() {
 }
 
 bool http_server::start() {
-    std::cout << "[HTTP] Opening http server on " << host << ':' << port << std::endl;
+    std::cout << "[HTTP] Opening http server on " << _host << ':' << _port << std::endl;
     auto res = _server->listen();
     if (!res.first) {
         std::cerr << res.second << std::endl;
@@ -36,10 +36,10 @@ bool http_server::start() {
 }
 
 ix::HttpResponsePtr http_server::handle_on_connection(const ix::HttpRequestPtr &request,
-                                                      const std::shared_ptr<ix::ConnectionState> &connectionState) {
+                                                      const std::shared_ptr<ix::ConnectionState> &) {
     std::cout << "[HTTP] [" << request->method << "]" << request->uri;
     std::string ss = request->uri == "/" ? "/index.html" : request->uri;
-    std::string filename = public_path + ss.erase(0, 1);
+    std::string filename = _public_directory + ss.erase(0, 1);
     std::ifstream requestedPage(filename);
 
     if (!requestedPage.is_open()) {
