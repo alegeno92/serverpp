@@ -1,9 +1,6 @@
-FROM --platform=$BUILDPLATFORM alegeno92/cmake:3.15.5 AS paho-c
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /log
+FROM  alpine:latest AS paho-c
+RUN apk add --no-cache cmake g++ make
 RUN apk add --no-cache git libressl-dev
-RUN apk add --no-cache --upgrade bash
 RUN git clone https://github.com/eclipse/paho.mqtt.c.git
 WORKDIR paho.mqtt.c
 RUN git checkout v1.3.1
@@ -11,10 +8,11 @@ RUN cmake -Bbuild -H. -DPAHO_WITH_SSL=ON -DPAHO_ENABLE_TESTING=OFF
 RUN cmake --build build/ --target install
 
 FROM paho-c AS paho-cpp
+WORKDIR /
 RUN apk add --no-cache git libressl-dev
 RUN apk add --no-cache --upgrade bash
 RUN git clone https://github.com/eclipse/paho.mqtt.cpp.git
-WORKDIR paho.mqtt.cpp
+WORKDIR /paho.mqtt.cpp
 RUN cmake -Bbuild -H. -DPAHO_BUILD_DOCUMENTATION=FALSE -DPAHO_BUILD_SAMPLES=FALSE
 RUN cmake --build build/ --target install
 
@@ -29,11 +27,9 @@ RUN cmake --build . --target ixwebsocket --
 RUN cmake --build . --target server --
 
 
-FROM --platform=$BUILDPLATFORM  alpine:latest
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
+FROM alpine:latest
 RUN apk add --no-cache zlib libressl libstdc++
-COPY ./public/* ./public/
+COPY --from=build-container /paho.mqtt.c/build/src/* /usr/lib/
+COPY --from=build-container /paho.mqtt.cpp/build/src/* /usr/lib/
 COPY --from=build-container /home/server/build/server ./
-COPY --from=build-container /usr/local/lib64/* /usr/local/lib/
-CMD ["./server"]
+CMD ["./server", "./config/config.json"]
