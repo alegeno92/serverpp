@@ -12,7 +12,7 @@
     "clean_session": true
   },
   "http_server": {
-    "public_directory": "./public",
+    "public_directory": "../public/",
     "address": "0.0.0.0",
     "port": 8000
   },
